@@ -23,11 +23,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # 暂时固定 Node 20 LTS，规避 Node 22 + npm 组合在 CI 中的偶发兼容问题。
+          node-version: 20
+          # 固定官方 npm 源，避免 lockfile 被镜像源污染导致安装结果不一致、CI 不稳定。
+          registry-url: https://registry.npmjs.org/
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          # 显式指定官方 npm registry，避免不同镜像返回差异包元数据影响可重复构建。
+          npm config set registry https://registry.npmjs.org/
+          npm ci --no-audit --no-fund
 
       - name: Run tests
         run: npm test
