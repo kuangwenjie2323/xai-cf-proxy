@@ -1,0 +1,10 @@
+name = "xai-cf-proxy"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+
+# Optional: set PROXY_TOKEN as a secret to restrict access
+# Run: npx wrangler secret put PROXY_TOKEN
+# Then set X-Proxy-Token header in your requests
+
+[observability]
+enabled = true

@@ -1,0 +1,14 @@
+{
+  "name": "xai-cf-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Worker reverse proxy for xAI API (api.x.ai)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
