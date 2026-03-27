@@ -35,6 +35,14 @@ jobs:
           npm config set registry https://registry.npmjs.org/
           npm ci --no-audit --no-fund
 
+      - name: Install dependencies (retry)
+        if: failure()
+        # Fallback for transient network/cache issues; does not replace the primary install logic.
+        # Keep the same registry configuration as the primary step to avoid inconsistent sources.
+        run: |
+          npm cache clean --force
+          npm ci --no-audit --no-fund
+
       - name: Run tests
         run: npm test
 
