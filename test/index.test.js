@@ -10,18 +10,23 @@ import worker, {
   jsonError,
 } from '../src/index.js';
 
-test('requires proxy token by default', async () => {
+test('allows open proxy mode by default when no token is configured', async () => {
   const request = new Request('https://example.workers.dev/v1/models');
-  const response = await worker.fetch(request, {});
-  assert.equal(response.status, 503);
-
-  const payload = await response.json();
-  assert.equal(payload.error.type, 'proxy_not_configured');
+  assert.equal(isProxyAuthorized(request, {}), true);
 });
 
 test('supports explicit open proxy mode', () => {
   const request = new Request('https://example.workers.dev/v1/models');
   assert.equal(isProxyAuthorized(request, { ALLOW_OPEN_PROXY: 'true' }), true);
+});
+
+test('can explicitly disable open proxy mode when no token is configured', async () => {
+  const request = new Request('https://example.workers.dev/v1/models');
+  const response = await worker.fetch(request, { ALLOW_OPEN_PROXY: 'false' });
+  assert.equal(response.status, 503);
+
+  const payload = await response.json();
+  assert.equal(payload.error.type, 'proxy_not_configured');
 });
 
 test('validates proxy token when configured', () => {
@@ -83,4 +88,3 @@ test('detects cloudflare html block pages', () => {
   assert.equal(isCloudflareBlock(403, 'text/html', body), true);
   assert.equal(isCloudflareBlock(403, 'application/json', '{"error":"forbidden"}'), false);
 });
-

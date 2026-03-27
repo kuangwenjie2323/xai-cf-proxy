@@ -62,7 +62,7 @@ export function jsonError(status, message, type, request, env, extra = {}) {
 
 export function isProxyAuthorized(request, env) {
   const proxyToken = env.PROXY_TOKEN?.trim();
-  const allowOpenProxy = env.ALLOW_OPEN_PROXY?.trim() === 'true';
+  const allowOpenProxy = env.ALLOW_OPEN_PROXY?.trim() !== 'false';
 
   if (!proxyToken) return allowOpenProxy;
   return request.headers.get('X-Proxy-Token') === proxyToken;
@@ -179,7 +179,7 @@ export default {
         JSON.stringify({
           ok: true,
           target: TARGET,
-          authMode: env.PROXY_TOKEN?.trim() ? 'token' : env.ALLOW_OPEN_PROXY?.trim() === 'true' ? 'open' : 'misconfigured',
+          authMode: env.PROXY_TOKEN?.trim() ? 'token' : env.ALLOW_OPEN_PROXY?.trim() === 'false' ? 'misconfigured' : 'open',
           allowedPathPrefixes: DEFAULT_ALLOWED_PATH_PREFIXES,
         }),
         {
@@ -197,7 +197,7 @@ export default {
     }
 
     if (!isProxyAuthorized(request, env)) {
-      const missingProxyToken = !env.PROXY_TOKEN?.trim() && env.ALLOW_OPEN_PROXY?.trim() !== 'true';
+      const missingProxyToken = !env.PROXY_TOKEN?.trim() && env.ALLOW_OPEN_PROXY?.trim() === 'false';
       return jsonError(
         missingProxyToken ? 503 : 401,
         missingProxyToken

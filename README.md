@@ -9,7 +9,6 @@ Solves Cloudflare 403 blocks when calling `api.x.ai` from VPS/data-center IPs.
 ```bash
 npm install
 npx wrangler login
-npx wrangler secret put PROXY_TOKEN
 npx wrangler deploy
 ```
 
@@ -25,7 +24,7 @@ GROK_BASE_URL=https://xai-cf-proxy.<your-subdomain>.workers.dev/v1
 
 Your `Authorization: Bearer <XAI_API_KEY>` header passes through unchanged.
 
-Also send your proxy token:
+If you enable a proxy token, also send:
 
 ```bash
 curl https://xai-cf-proxy.<your-subdomain>.workers.dev/v1/models \
@@ -35,8 +34,8 @@ curl https://xai-cf-proxy.<your-subdomain>.workers.dev/v1/models \
 
 ## Security model
 
-- The proxy is **closed by default**.
-- You must set `PROXY_TOKEN`, or explicitly opt in to open access with `ALLOW_OPEN_PROXY=true`.
+- The proxy is **open by default** when `PROXY_TOKEN` is not set.
+- Set `PROXY_TOKEN` if you want private access enforced.
 - Only `/v1/*` API paths are forwarded.
 - Cloudflare / HTML upstream error pages are rewritten into JSON errors so downstream clients do not receive raw HTML.
 
@@ -54,7 +53,7 @@ Optional plain vars:
 # Restrict browser callers if needed. Default behavior reflects request Origin.
 ALLOWED_ORIGIN=https://your-app.example.com
 
-# Not recommended. Only use if you intentionally want an open proxy.
+# Optional hard fail when PROXY_TOKEN is absent.
 ALLOW_OPEN_PROXY=false
 ```
 
@@ -70,7 +69,7 @@ Example response:
 {
   "ok": true,
   "target": "https://api.x.ai",
-  "authMode": "token",
+  "authMode": "open",
   "allowedPathPrefixes": ["/v1/"]
 }
 ```
